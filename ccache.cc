@@ -80,12 +80,14 @@ struct Set {
 struct Cache {
   Cache(size_t nset, size_t assoc, size_t nwarmup) {
     sets.resize(nset, Set(assoc));
+    size = nset * assoc * BLKSIZE;
   }
 
   std::vector<Set> sets;
   size_t naccess = 0;
   size_t nhit = 0;
   size_t nwarmup = 0;
+  size_t size = 0;
 
   void Access(Address addr) {
     auto idx = SetIdx(addr, sets.size(), BLKSIZE);
@@ -98,6 +100,8 @@ struct Cache {
       --nwarmup;
     }
   }
+
+  size_t Size() const { return size; }
 };
 
 int main(int argc, char *argv[]) {
@@ -106,6 +110,8 @@ int main(int argc, char *argv[]) {
   const char *file = argv[3];
 
   auto cache = Cache(nset, assoc, 1'000'000);
+  printf("Set: %zu, Assoc: %zu, Blk %zu, Size: %zu\n", nset, assoc,
+         (size_t)BLKSIZE, cache.Size());
 
   auto fstream = std::ifstream();
   fstream.open(file);
