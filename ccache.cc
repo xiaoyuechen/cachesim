@@ -93,7 +93,7 @@ struct Cache {
     auto idx = SetIdx(addr, sets.size(), BLKSIZE);
     auto hit = sets[idx].Access(BlkAddr(addr, BLKSIZE));
 
-    if (!nwarmup) {
+    if (nwarmup) {
       ++naccess;
       nhit += hit;
     } else {
