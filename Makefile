@@ -29,3 +29,4 @@ clean:
 
 .PHONY: experiment
 experiment: ccache
+	./experiment

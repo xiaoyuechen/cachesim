@@ -1,9 +1,13 @@
 #!/bin/bash
 
+mkdir -p results
+
 for f in ICAR-traces/*; do
     for i in {0..10}; do
         nset=$(((2 ** i) * 16))
-        echo "running $nset set on $f"
-        ./ccache $nset 16 "$f" &
+        result="results/$(basename ${f})-${nset}-set"
+        cmd="./ccache $nset 16 $f | tee $result"
+        eval $cmd &
     done
 done
+wait
