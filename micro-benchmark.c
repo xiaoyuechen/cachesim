@@ -20,9 +20,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "micro.h"
-
-int start_bool = 0;
 
 typedef struct {
   uint8_t dummy[64];
@@ -32,19 +29,17 @@ typedef struct {
   Blk blks[2048];
 } DataSet;
 
-DataSet datasets[128];
+volatile DataSet datasets[128];
 
 int main() {
-  start_bool = 1;
-  for (size_t i = 0; i < 128; ++i) {
-    for (size_t j = 0; j < 2; ++j) {
-      for (size_t k = 0; k < 2048; ++k) {
-        uint8_t tmp = datasets[i].blks[k].dummy[0];
-        uint8_t tmp1 = datasets[i].blks[k].dummy[0];
+  for (register size_t i = 0; i < 128; ++i) {
+    for (register size_t j = 0; j < 2; ++j) {
+      for (register size_t k = 0; k < 2048; ++k) {
+        datasets[i].blks[k].dummy[0];
+        datasets[i].blks[k].dummy[0];
       }
     }
   }
-  start_bool = 0;
 
   return 0;
 }

@@ -2,12 +2,12 @@
 
 mkdir -p results
 
-for f in ICAR-traces/*; do
+f="tracer/memory_trace"
     for i in {0..10}; do
         nset=$(((2 ** i) * 16))
         result="results/$(basename ${f})-${nset}-set"
         cmd="./ccache $nset 16 $f | tee $result"
-        eval $cmd &
+        eval $cmd
     done
-done
+
 wait
