@@ -13,7 +13,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CXXFLAGS = -O3 -g
+CXXFLAGS = -O3 -std=c++20 -fno-exceptions
 
 .PHONY: all
 all: ccache micro-benchmark
@@ -25,7 +25,7 @@ micro-benchmark: micro-benchmark.c
 
 .PHONY: clean
 clean:
-	rm cache micro-benchmark
+	rm -f ccache micro-benchmark
 
 .PHONY: experiment
 experiment: ccache

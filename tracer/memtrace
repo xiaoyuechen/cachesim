@@ -1,0 +1,6 @@
+#!/bin/bash
+
+PIN=${PIN_ROOT}/pin
+TRACER=$(dirname "$0")/obj-intel64/memtrace.so
+
+$PIN -t $TRACER $@

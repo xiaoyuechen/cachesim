@@ -1,13 +1,3 @@
 #!/bin/bash
 
-mkdir -p results
-
-f="tracer/memory_trace"
-    for i in {0..10}; do
-        nset=$(((2 ** i) * 16))
-        result="results/$(basename ${f})-${nset}-set"
-        cmd="./ccache $nset 16 $f | tee $result"
-        eval $cmd
-    done
-
-wait
+./tracer/memtrace -filter_rtn main -- ./micro-benchmark | ./ccache 16 16 64

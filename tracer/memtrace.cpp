@@ -3,6 +3,7 @@
 #include "filter.H"
 #include "instlib.H"
 
+#include <cstdio>
 #include <stdio.h>
 
 INSTLIB::FILTER filter;
@@ -49,7 +50,7 @@ int main(int argc, char *argv[]) {
   if (PIN_Init(argc, argv))
     return Usage();
 
-  file = fopen("memory_trace", "w");
+  file = stdout;
 
   filter.Activate();
   INS_AddInstrumentFunction(Instruction, 0);
