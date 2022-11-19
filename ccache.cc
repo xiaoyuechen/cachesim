@@ -91,14 +91,23 @@ struct Cache {
   size_t blksize = 0;
 };
 
-int main(int argc, char *argv[]) {
-  size_t nset = std::atoi(argv[1]);
-  size_t assoc = std::atoi(argv[2]);
-  size_t blksize = std::atoi(argv[3]);
+struct Arg {
+  size_t nset;
+  size_t assoc;
+  size_t blksize;
+};
 
-  auto cache = Cache(nset, assoc, blksize);
-  printf("Set: %zu, Assoc: %zu, Blk %zu, Size: %zu\n", nset, assoc, blksize,
-         cache.Size());
+int main(int argc, char *argv[]) {
+  union {
+    Arg arg = {.nset = 16, .assoc = 16, .blksize = 64};
+    size_t dummy[3];
+  };
+
+  std::transform(argv + 1, argv + argc, dummy, std::atoll);
+
+  auto cache = Cache(arg.nset, arg.assoc, arg.blksize);
+  printf("Set: %zu, Assoc: %zu, Blk %zu, Size: %zu\n", arg.nset, arg.assoc,
+         arg.blksize, cache.Size());
 
   static constexpr size_t NCHAR = 64;
   char addr[NCHAR];
