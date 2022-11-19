@@ -38,6 +38,17 @@ VOID Instruction(INS ins, VOID *v) {
   }
 }
 
+VOID Trace(TRACE trace, VOID *v) {
+  if (!filter.SelectTrace(trace))
+    return;
+
+  for (BBL bbl = TRACE_BblHead(trace); BBL_Valid(bbl); bbl = BBL_Next(bbl)) {
+    for (INS ins = BBL_InsHead(bbl); INS_Valid(ins); ins = INS_Next(ins)) {
+      Instruction(ins, 0);
+    }
+  }
+}
+
 VOID Fini(INT32 code, VOID *v) { fclose(file); }
 
 INT32 Usage() {
@@ -53,7 +64,7 @@ int main(int argc, char *argv[]) {
   file = stdout;
 
   filter.Activate();
-  INS_AddInstrumentFunction(Instruction, 0);
+  TRACE_AddInstrumentFunction(Trace, 0);
   PIN_AddFiniFunction(Fini, 0);
 
   // Never returns
