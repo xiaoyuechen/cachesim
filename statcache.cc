@@ -41,10 +41,11 @@ constexpr Address BlkAddr(Address addr, size_t blksize) {
 }
 
 int main(int argc, char *argv[]) {
-  size_t n_cache_line = 16 * 16;
+  size_t n_cache_line = 16 * std::atoi(argv[1]);
   size_t blksize = 64;
-  size_t window_size = 200'000;
-  float sample_rate = 1e-4;
+  size_t window_size = 10'000'000;
+  //float sample_rate = 1e-4;
+  float sample_rate = 1e-2;
   float threshold = 1e-4;
 
   std::default_random_engine generator;
@@ -89,12 +90,11 @@ int main(int argc, char *argv[]) {
                 auto [dist, count] = pair;
                 return acc + count * (1.0f - pow(1.0f - 1.0f / n_cache_line,
                                                  r * dist));
-              }) +
-          watch.size(); /* the cold misses */
+              }) + watch.size(); /* the cold misses */
 
       if (std::abs(rhs - lhs) / (sample_rate * win_i) < threshold) {
         window_r.push_back(r);
-        printf("window %zu: %f%%\n", window_r.size(), window_r.back() * 100);
+//        printf("window %zu: %f%%\n", window_r.size(), window_r.back() * 100);
         break;
       }
 
