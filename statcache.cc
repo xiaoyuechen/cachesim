@@ -36,8 +36,13 @@ struct Arg {
   float threshold = 1e-4;
 };
 
+constexpr Address BlkAddr(Address addr, size_t blksize) {
+  return addr & ~(blksize - 1);
+}
+
 int main(int argc, char *argv[]) {
   size_t n_cache_line = 16 * 16;
+  size_t blksize = 64;
   size_t window_size = 200'000;
   float sample_rate = 1e-4;
   float threshold = 1e-4;
@@ -58,7 +63,7 @@ int main(int argc, char *argv[]) {
       static constexpr size_t NCHAR = 64;
       char buff[NCHAR];
       std::cin.getline(buff, NCHAR);
-      Address addr = std::atoll(buff);
+      Address addr = BlkAddr(std::atoll(buff), blksize);
 
       auto found = watch.find(addr);
       if (found != watch.end()) {
