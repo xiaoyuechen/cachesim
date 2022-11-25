@@ -21,6 +21,7 @@
 #include <cstdint>
 #include <iostream>
 #include <list>
+#include <random>
 #include <vector>
 
 using Address = uint64_t;
@@ -50,7 +51,10 @@ struct Block {
 };
 
 struct Set {
-  Set(size_t assoc) { blocks.resize(assoc); };
+  Set(size_t assoc, size_t replacement_policy) : distribution(0, assoc - 1) {
+    blocks.resize(assoc);
+    this->replacement_policy = replacement_policy;
+  };
 
   bool Access(Address addr) {
     auto ownblk =
@@ -61,21 +65,32 @@ struct Set {
       blocks.splice(blocks.begin(), blocks, ownblk);
       return true;
     } else {
-      blocks.splice(blocks.begin(), blocks, --blocks.end());
+      if (replacement_policy == 0) {
+        blocks.splice(blocks.begin(), blocks, --blocks.end());
+      } else if (replacement_policy == 1) {
+        int nth = distribution(generator);
+        auto it = blocks.begin();
+        for (int i = 0; i < nth; ++i)
+          ++it;
+        blocks.splice(blocks.begin(), blocks, it);
+      }
       blocks.front().Update(addr);
       return false;
     }
   }
 
   std::list<Block> blocks;
+  size_t replacement_policy;
+  std::default_random_engine generator;
+  std::uniform_int_distribution<int> distribution;
 };
 
 struct Cache {
-  Cache(size_t nset, size_t assoc, size_t blksize) {
+  Cache(size_t nset, size_t assoc, size_t replacement_policy, size_t blksize) {
     this->nset = nset;
     this->assoc = assoc;
     this->blksize = blksize;
-    sets.resize(nset, Set(assoc));
+    sets.resize(nset, Set(assoc, replacement_policy));
   }
 
   bool Access(Address addr) {
@@ -94,20 +109,24 @@ struct Cache {
 struct Arg {
   size_t nset;
   size_t assoc;
+  size_t replacement_policy; /* 0 means LRU, 1 means random */
   size_t blksize;
 };
 
 int main(int argc, char *argv[]) {
   union {
-    Arg arg = {.nset = 16, .assoc = 16, .blksize = 64};
-    size_t dummy[3];
+    Arg arg = {.nset = 16, .assoc = 16, .replacement_policy = 0, .blksize = 64};
+    size_t dummy[4];
   };
 
   std::transform(argv + 1, argv + argc, dummy, std::atoll);
 
-  auto cache = Cache(arg.nset, arg.assoc, arg.blksize);
-  printf("Set: %zu, Assoc: %zu, Blk %zu, Size: %zu\n", arg.nset, arg.assoc,
-         arg.blksize, cache.Size());
+  const char *repl_str[] = {"LRU", "Random"};
+
+  auto cache = Cache(arg.nset, arg.assoc, arg.replacement_policy, arg.blksize);
+  printf("Set: %zu, Assoc: %zu, Repl: %s, Blk %zu, Size: %zu\n", arg.nset,
+         arg.assoc, repl_str[arg.replacement_policy], arg.blksize,
+         cache.Size());
 
   static constexpr size_t NCHAR = 64;
   char addr[NCHAR];
