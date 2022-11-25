@@ -13,12 +13,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-CXXFLAGS = -O3 -std=c++20 -fno-exceptions
+CXXFLAGS = -O3 -std=c++20 -fno-exceptions -g
 
 .PHONY: all
-all: ccache micro-benchmark
+all: ccache statcache micro-benchmark
 
 ccache:
+
+statcache:
 
 micro-benchmark: micro-benchmark.c
 	$(CC) -O0 -g micro-benchmark.c -o micro-benchmark
